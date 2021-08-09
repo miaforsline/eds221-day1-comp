@@ -1,0 +1,57 @@
+---
+title: "Toolik Chlorophyll Concentrations"
+author: "Mia Forsline"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(here)
+library(skimr)
+```
+
+### Read in data 
+```{r}
+toolik_chlorophyll <- read_csv(here::here("data", "data-raw", "toolik_chlorophyll.csv"), 
+                               na = ".")
+```
+
+Explore the imported data 
+```{r}
+skim(toolik_chlorophyll)
+names(toolik_chlorophyll)
+dim(toolik_chlorophyll)
+summary(toolik_chlorophyll)
+```
+Clean up column names
+```{r}
+#toolik_chlorophyll <- toolik_chlorophyll %>% clean_names()
+toolik_chlorophyll <- clean_names(toolik_chlorophyll)
+```
+
+Scatterplot of depth vs chlorophyll A concentration 
+- make point size `size` change based on concentration 
+- make all points "cyan" 
+- update theme to `theme_dark()`
+```{r}
+#color is not associated w/a variable = outside of aes()
+chlorophyll_plot <- ggplot(data = toolik_chlorophyll, aes(x = active_chl_a_ug_l, y = depth))+ 
+  geom_point(aes(size = active_chl_a_ug_l), 
+             alpha = 0.5,
+             color = "cyan")+
+  theme_dark()+
+  labs(x = "Active Chlorophyll A", 
+       y = "Depth",
+       size = "Active Chlorophyll A")+ 
+  scale_y_reverse() #reverse y-axis so zero is at the top 
+
+chlorophyll_plot
+```
+
+```{r}
+ggsave(here::here("figs", "chlorophyll_graph.jpg"), plot = chlorophyll_plot)
+```
+
